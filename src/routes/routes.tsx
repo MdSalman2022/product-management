@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Spin } from 'antd';
 import Main from '@/layout/Main';
+import PageError from '@/components/Shared/PageError';
 
 const ProductListPage = lazy(() => import('@/pages/Products/ProductListPage'));
 const ProductDetailPage = lazy(() => import('@/pages/Products/ProductDetailPage'));
@@ -37,6 +38,16 @@ export default function AppRoutes() {
             <Suspense fallback={<PageLoader />}>
               <ProductDetailPage />
             </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <PageError
+              status="404"
+              title="Page not found"
+              subTitle="The page you're looking for doesn't exist."
+            />
           }
         />
       </Route>
