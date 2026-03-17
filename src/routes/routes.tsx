@@ -32,7 +32,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/product/:id"
+          path="/products/:id"
           element={
             <Suspense fallback={<PageLoader />}>
               <ProductDetailPage />
