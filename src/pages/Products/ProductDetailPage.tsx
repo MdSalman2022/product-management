@@ -247,26 +247,44 @@ export default function ProductDetailPage() {
             rules={[
               { required: true, message: 'Title is required' },
               { min: 3, message: 'At least 3 characters' },
+              { max: 150, message: 'Cannot exceed 150 characters' },
+              {
+                validator: (_, value) =>
+                  !value || value.trim().length > 0
+                    ? Promise.resolve()
+                    : Promise.reject(new Error('Title cannot be blank spaces')),
+              },
             ]}
           >
-            <Input className="h-10 text-base" />
+            <Input className="h-10 text-base" showCount maxLength={150} />
           </Form.Item>
           <Form.Item
             name="description"
             label="Description"
-            rules={[{ required: true, message: 'Description is required' }]}
+            rules={[
+              { required: true, message: 'Description is required' },
+              { min: 10, message: 'At least 10 characters' },
+              { max: 1000, message: 'Cannot exceed 1000 characters' },
+            ]}
           >
-            <Input.TextArea rows={5} className="text-base" />
+            <Input.TextArea rows={5} className="text-base" showCount maxLength={1000} />
           </Form.Item>
           <Form.Item
             name="price"
             label="Price ($)"
             rules={[
               { required: true, message: 'Price is required' },
-              { type: 'number', min: 0.01, message: 'Must be greater than 0' },
+              { type: 'number', min: 0.01, message: 'Must be greater than $0' },
+              { type: 'number', max: 1_000_000, message: 'Cannot exceed $1,000,000' },
             ]}
           >
-            <InputNumber className="h-10 w-full text-base" min={0.01} precision={2} />
+            <InputNumber
+              className="h-10 w-full text-base"
+              min={0.01}
+              max={1_000_000}
+              precision={2}
+              prefix="$"
+            />
           </Form.Item>
           <Form.Item
             name="stock"
@@ -274,21 +292,26 @@ export default function ProductDetailPage() {
             rules={[
               { required: true, message: 'Stock is required' },
               { type: 'number', min: 0, message: 'Cannot be negative' },
+              { type: 'number', max: 100_000, message: 'Cannot exceed 100,000 units' },
             ]}
           >
-            <InputNumber className="h-10 w-full text-base" min={0} precision={0} />
+            <InputNumber className="h-10 w-full text-base" min={0} max={100_000} precision={0} />
           </Form.Item>
           <Form.Item
             name="brand"
             label="Brand"
-            rules={[{ required: true, message: 'Brand is required' }]}
+            rules={[
+              { required: true, message: 'Brand is required' },
+              { min: 2, message: 'At least 2 characters' },
+              { max: 80, message: 'Cannot exceed 80 characters' },
+            ]}
           >
             <Input className="h-10 text-base" />
           </Form.Item>
           <Form.Item
             name="category"
             label="Category"
-            rules={[{ required: true, message: 'Category is required' }]}
+            rules={[{ required: true, message: 'Please select a category' }]}
           >
             <Select
               options={categories.map((cat) => ({ label: cat, value: cat }))}
@@ -300,7 +323,18 @@ export default function ProductDetailPage() {
             label="Thumbnail URL"
             rules={[
               { required: true, message: 'URL is required' },
-              { type: 'url', message: 'Enter a valid URL' },
+              { type: 'url', message: 'Enter a valid URL (must start with http/https)' },
+              {
+                validator: (_, value) => {
+                  if (!value) return Promise.resolve();
+                  const imageExtensions = /\.(jpg|jpeg|png|webp|gif|svg|avif)(\?.*)?$/i;
+                  const knownImageHosts = /cdn\.|images\.|img\.|assets\.|media\./i;
+                  if (imageExtensions.test(value) || knownImageHosts.test(value)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('URL should point to an image file'));
+                },
+              },
             ]}
           >
             <Input className="h-10 text-base" placeholder="https://..." />
