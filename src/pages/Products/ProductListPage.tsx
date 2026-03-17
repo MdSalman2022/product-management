@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Table, Input, Select, Button, Tag, Card, Rate, Avatar, Pagination } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -27,8 +27,19 @@ export default function ProductListPage() {
     resetFilters,
   } = useProductStore();
 
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setPage(1);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, setPage]);
+
   const skip = (page - 1) * pageSize;
-  const isSearching = searchQuery.trim().length > 0;
+  const isSearching = debouncedQuery.trim().length > 0;
   const isFiltering = selectedCategory.length > 0;
 
   const {
@@ -38,7 +49,7 @@ export default function ProductListPage() {
     error,
   } = useProducts(skip, pageSize);
   const { data: searchData, isFetching: fetchingSearch } = useSearchProducts(
-    searchQuery,
+    debouncedQuery,
     skip,
     pageSize
   );
