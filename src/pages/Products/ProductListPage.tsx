@@ -10,6 +10,7 @@ import {
 } from '@/hooks/useProducts';
 import { useProductStore } from '@/store/useProductStore';
 import PageError from '@/components/Shared/PageError';
+import ProductListSkeleton from '@/components/Shared/ProductListSkeleton';
 import type { Product } from '@/types/product';
 
 export default function ProductListPage() {
@@ -30,7 +31,12 @@ export default function ProductListPage() {
   const isSearching = searchQuery.trim().length > 0;
   const isFiltering = selectedCategory.length > 0;
 
-  const { data: allData, isFetching: fetchingAll, error } = useProducts(skip, pageSize);
+  const {
+    data: allData,
+    isFetching: fetchingAll,
+    isLoading: initialLoading,
+    error,
+  } = useProducts(skip, pageSize);
   const { data: searchData, isFetching: fetchingSearch } = useSearchProducts(
     searchQuery,
     skip,
@@ -134,6 +140,10 @@ export default function ProductListPage() {
         onBack={() => window.location.reload()}
       />
     );
+  }
+
+  if (initialLoading && !isSearching && !isFiltering) {
+    return <ProductListSkeleton rows={pageSize} />;
   }
 
   return (

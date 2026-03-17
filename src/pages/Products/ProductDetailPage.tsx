@@ -17,8 +17,8 @@ import type { CarouselRef } from 'antd/es/carousel';
 import { Pencil } from 'lucide-react';
 import { useProductById, useCategories } from '@/hooks/useProducts';
 import { usePageHeader } from '@/context/PageHeaderContext';
-import PageSpinner from '@/components/Shared/PageSpinner';
 import PageError from '@/components/Shared/PageError';
+import ProductDetailSkeleton from '@/components/Shared/ProductDetailSkeleton';
 import type { ProductFormValues } from '@/types/product';
 
 export default function ProductDetailPage() {
@@ -76,7 +76,7 @@ export default function ProductDetailPage() {
   }
 
   if (isLoading) {
-    return <PageSpinner />;
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
